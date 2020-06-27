@@ -1,0 +1,28 @@
+- name: Setup hosts.
+  hosts: dione
+  remote_user: root
+  become: true
+  become_method: sudo
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: Update packages
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+  - name: Pip
+    apt:
+      pkg:
+      - python3-pip
+      - docker.io
+  - pip:
+      name: docker
+  - name: Container present
+    docker_container:
+      name: proxy
+      state: started
+      image: traefik:2.2.1
+      ports:
+       - "{{ wg_ip }}:80:80"
+       - "{{ wg_ip }}:443:443"
+
