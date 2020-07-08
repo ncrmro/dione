@@ -6,23 +6,93 @@
   vars_files:
     - vars.yml
   tasks:
-  - name: Update packages
-    apt:
-      update_cache: yes
-      cache_valid_time: 3600
-  - name: Pip
-    apt:
-      pkg:
-      - python3-pip
-      - docker.io
-  - pip:
-      name: docker
-  - name: Container present
-    docker_container:
-      name: proxy
-      state: started
-      image: traefik:2.2.1
-      ports:
-       - "{{ wg_ip }}:80:80"
-       - "{{ wg_ip }}:443:443"
+#  - name: Update packages
+#    apt:
+#      update_cache: yes
+#      cache_valid_time: 3600
+#  - name: Pip
+#    apt:
+#      pkg:
+#      - python3-pip
+#      - docker.io
+#  - pip:
+#      name: docker
+#  - name: Remove a volume
+#    docker_volume:
+#      name: pgdata
+#      force: true
+#      state: absent
 
+  - name: Create a volume with options
+    docker_volume:
+      name: pgdata
+      driver: local
+      driver_options:
+        type: nfs
+        device: :/mnt/ocean/block_storage/postgres-data
+        o: addr=192.168.1.88,rw,vers=4,async
+
+  - name: Start Postgres
+    docker_container:
+      name: pg
+      state: started
+      image: postgres:12.3
+      recreate: true
+      env:
+        POSTGRES_USER: ncrmro
+        POSTGRES_PASSWORD: test_password
+        PGDATA: /var/lib/postgresql/data
+      ports:
+       - "{{ wg_ip }}:5432:5432"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+
+#     --mount 'type=volume,src=<VOLUME-NAME>,dst=<CONTAINER-PATH>,volume-driver=local,
+# volume-opt=type=nfs,volume-opt=device=<nfs-server>:<nfs-path>,"volume-opt=o=addr=<nfs-address>,vers=4,soft,timeo=180,bg,tcp,rw"'
+
+#  - name: Container present
+#    docker_container:
+#      name: graf
+#      state: started
+#      image: grafana/grafana:6.5.0
+#      labels:
+#        traefik.enable: "true"
+#        traefik.http.routers.graf.rule: Host(`grafana.wg`)
+#        traefik.http.routers.graf.entrypoints: web
+#
+#  - name: Prometheus
+#    docker_container:
+#      name: prom
+#      state: started
+#      image: prom/prometheus
+#      labels:
+#        traefik.enable: "true"
+#        traefik.http.routers.prom.rule: Host(`prom.wg`)
+#        traefik.http.routers.prom.entrypoints: web
+#      mounts:
+#        - type: volume
+#          source: nfsvolume
+#          target: /prometheus
+#          volume_driver: local
+#          volume_options:
+#            type: nfs
+#            device: :/mnt/ocean/block_storage/prometheus-data
+#            o: 10.2.3.10,rw,nfsvers=4,async
+#
+#  - name: Container present
+#    docker_container:
+#      name: proxy
+#      state: started
+#      image: traefik:2.2.1
+#      recreate: true
+#      ports:
+#       - "{{ wg_ip }}:80:80"
+#       - "{{ wg_ip }}:443:443"
+#      volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#      command: >
+#        --log.level=DEBUG
+#        --api.insecure=true
+#        --providers.docker=true
+#        --providers.docker.exposedbydefault=false
+#        --entrypoints.web.address=:80
