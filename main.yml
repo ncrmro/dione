@@ -41,12 +41,28 @@
         device: :/mnt/ocean/block_storage/prometheus-data
         o: addr=192.168.1.88,rw,vers=4,async
 
+  - name: Create a volume with options
+    docker_volume:
+      name: grafdata
+      driver: local
+      driver_options:
+        type: nfs
+        device: :/mnt/ocean/block_storage/grafana-data
+        o: addr=192.168.1.88,rw,vers=4,async
+
+  - name: Create a network
+    docker_network:
+      name: pg
+
+  - name: Create prometheus network
+    docker_network:
+      name: prom
+
   - name: Start Postgres
     docker_container:
       name: pg
       state: started
       image: postgres:12.3
-      recreate: true
       restart_policy: always
       env:
         POSTGRES_USER: ncrmro
@@ -56,6 +72,8 @@
        - "{{ wg_ip }}:5432:5432"
       volumes:
         - pgdata:/var/lib/postgresql/data
+      networks:
+        - name: pg
 
   - name: Prometheus
     docker_container:
@@ -69,23 +87,33 @@
         traefik.http.routers.prom.entrypoints: web
       volumes:
         - promdata:/prometheus:nocopy
+      networks:
+        - name: pg
+        - name: prom
 
-#  - name: Container present
-#    docker_container:
-#      name: graf
-#      state: started
-#      image: grafana/grafana:6.5.0
-#      labels:
-#        traefik.enable: "true"
-#        traefik.http.routers.graf.rule: Host(`grafana.wg`)
-#        traefik.http.routers.graf.entrypoints: web
-#      volumes:
-#        - grafdata:/etc/grafana
-
-#
-
-#
   - name: Container present
+    docker_container:
+      name: graf
+      state: started
+      image: grafana/grafana:6.5.0
+      recreate: true
+      env:
+        GF_DATABASE_TYPE: postgres
+        GF_DATABASE_HOST: pg:5432
+        GF_DATABASE_NAME: grafana
+        GF_DATABASE_USER: grafana
+        GF_DATABASE_PASSWORD: grafana
+      labels:
+        traefik.enable: "true"
+        traefik.http.routers.graf.rule: Host(`grafana.wg`)
+        traefik.http.routers.graf.entrypoints: web
+      volumes:
+        - grafdata:/etc/grafana
+      networks:
+        - name: pg
+        - name: prom
+
+  - name: Create Traefik container
     docker_container:
       name: proxy
       state: started
@@ -97,9 +125,11 @@
        - "{{ wg_ip }}:443:443"
       volumes:
        - /var/run/docker.sock:/var/run/docker.sock
+#        --log.level=DEBUG
       command: >
-        --log.level=DEBUG
         --api.insecure=true
         --providers.docker=true
         --providers.docker.exposedbydefault=false
         --entrypoints.web.address=:80
+      networks:
+        - name: prom
