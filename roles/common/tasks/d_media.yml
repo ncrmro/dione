@@ -1,0 +1,86 @@
+- name: Create media network
+  docker_network:
+    name: media
+
+- name: Create sonarr_config volume
+  docker_volume:
+    name: sonarr_config
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/sonarr-config
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create radarr_config volume with options
+  docker_volume:
+    name: radarr_config
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/radarr-config
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create media_tv volume
+  docker_volume:
+    name: media_tv
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/media/tv
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create media_movies volume
+  docker_volume:
+    name: media_movies
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/media/movies
+      o: addr=192.168.1.88,rw,vers=4,async
+
+# https://old.reddit.com/r/usenet/wiki/docker
+- name: Sonarr
+  docker_container:
+    name: sonarr
+    state: started
+    image: linuxserver/sonarr
+    restart_policy: always
+    recreate: true
+    env:
+      PUID: "0"
+      PGID: "0"
+      TZ: "America/Chicago"
+      UMASK_SET: "022"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.sonarr.rule: Host(`sonarr.wg`)
+      traefik.http.routers.sonarr.entrypoints: web
+    volumes:
+      - sonarr_config:/config
+      - media_tv:/data/media/tv
+      - nzbget_downloads:/data/usnet
+    networks:
+      - name: media
+
+- name: Radarr
+  docker_container:
+    name: radarr
+    state: started
+    image: linuxserver/radarr
+    restart_policy: always
+    recreate: true
+    env:
+      PUID: "0"
+      PGID: "0"
+      TZ: "America/Chicago"
+      UMASK_SET: "022"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.radarr.rule: Host(`radar.wg`)
+      traefik.http.routers.radarr.entrypoints: web
+    volumes:
+      - radarrrconfig:/config
+      - nzbgetdata:/data/usnet
+      - media_movies:/data/media/movies
+    networks:
+      - name: media

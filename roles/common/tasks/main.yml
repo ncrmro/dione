@@ -1,0 +1,29 @@
+#- name: Update packages
+#  apt:
+#    update_cache: yes
+#    cache_valid_time: 3600
+#- name: Pip
+#  apt:
+#    pkg:
+#    - python3-pip
+#    - docker.io
+#- pip:
+#    name: docker
+
+#- name: Set up Traefik Proxy
+#  include: "d_traefik.yml"
+
+#- name: Set up nzbGet
+#  include: "d_nzbget.yml"
+
+- name: Set up media
+  include: "d_media.yml"
+
+
+
+- name: Set up Traefik Proxy
+  include: "d_traefik.yml"
+
+
+
+

@@ -1,0 +1,29 @@
+- name: Create a volume with options
+  docker_volume:
+    name: grafdata
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/grafana-data
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Container present
+  docker_container:
+    name: graf
+    state: started
+    image: grafana/grafana:6.5.0
+    env:
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: pg:5432
+      GF_DATABASE_NAME: grafana
+      GF_DATABASE_USER: grafana
+      GF_DATABASE_PASSWORD: grafana
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.graf.rule: Host(`grafana.wg`)
+      traefik.http.routers.graf.entrypoints: web
+    volumes:
+      - grafdata:/etc/grafana
+    networks:
+      - name: pg
+      - name: prom

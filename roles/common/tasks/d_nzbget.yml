@@ -1,0 +1,35 @@
+- docker_volume:
+    name: nzbget_config
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/nzbget-config
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- docker_volume:
+    name: nzbget_downloads
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/downloads/usenet
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Nzbget
+  docker_container:
+    name: nzbget
+    state: started
+    image: linuxserver/nzbget
+    restart_policy: always
+    env:
+      PUID: "0"
+      PGID: "0"
+      TZ: "America/Chicago"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.nzbget.rule: Host(`nzbget.wg`)
+      traefik.http.routers.nzbget.entrypoints: web
+    volumes:
+      - nzbget_config:/config:nocopy
+      - nzbget_downloads:/downloads:nocopy
+    networks:
+      - name: media

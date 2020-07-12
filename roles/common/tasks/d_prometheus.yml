@@ -1,0 +1,28 @@
+- name: Create a volume with options
+  docker_volume:
+    name: promdata
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/prometheus-data
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create prometheus network
+  docker_network:
+    name: prom
+
+- name: Prometheus
+  docker_container:
+    name: prom
+    state: started
+    image: prom/prometheus
+    restart_policy: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prom.rule: Host(`prom.wg`)
+      traefik.http.routers.prom.entrypoints: web
+    volumes:
+      - promdata:/prometheus:nocopy
+    networks:
+      - name: pg
+      - name: prom

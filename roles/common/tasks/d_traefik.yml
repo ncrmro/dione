@@ -1,0 +1,20 @@
+- name: Create Traefik container
+  docker_container:
+    name: proxy
+    state: started
+    image: traefik:2.2.1
+    recreate: true
+    restart_policy: always
+    ports:
+     - "{{ wg_ip }}:80:80"
+     - "{{ wg_ip }}:443:443"
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+#        --log.level=DEBUG
+    command: >
+      --api.insecure=true
+      --providers.docker=true
+      --providers.docker.exposedbydefault=false
+      --entrypoints.web.address=:80
+    networks:
+      - name: prom

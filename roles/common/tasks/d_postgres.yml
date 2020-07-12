@@ -1,0 +1,29 @@
+- name: Create a volume with options
+  docker_volume:
+    name: pgdata
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/postgres-data
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create a network
+  docker_network:
+    name: pg
+
+- name: Start Postgres
+  docker_container:
+    name: pg
+    state: started
+    image: postgres:12.3
+    restart_policy: always
+    env:
+      POSTGRES_USER: ncrmro
+      POSTGRES_PASSWORD: test_password
+      PGDATA: /var/lib/postgresql/data
+    ports:
+     - "{{ wg_ip }}:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - name: pg
