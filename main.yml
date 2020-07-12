@@ -61,12 +61,14 @@
 
   - name: Create a volume with options
     docker_volume:
-      name: nzbgetconfig
+      name: mediatv
       driver: local
       driver_options:
         type: nfs
-        device: :/mnt/ocean/block_storage/nzbget-config
+        device: :/mnt/ocean/media/tv
         o: addr=192.168.1.88,rw,vers=4,async
+
+
 
   - name: Create a network
     docker_network:
@@ -118,7 +120,6 @@
       name: graf
       state: started
       image: grafana/grafana:6.5.0
-      recreate: true
       env:
         GF_DATABASE_TYPE: postgres
         GF_DATABASE_HOST: pg:5432
@@ -141,7 +142,6 @@
       state: started
       image: linuxserver/nzbget
       restart_policy: always
-      recreate: true
       env:
         PUID: "1000"
         PGID: "1000"
@@ -153,6 +153,31 @@
       volumes:
         - nzbgetdata:/downloads
         - nzbgetconfig:/config
+      networks:
+        - name: media
+
+# https://old.reddit.com/r/usenet/wiki/docker
+  - name: Sonarr
+    docker_container:
+      name: sonarr
+      state: started
+      image: linuxserver/sonarr
+      restart_policy: always
+      recreate: true
+      #8675309
+      env:
+        PUID: "0"
+        PGID: "0"
+        TZ: "America/Chicago"
+        UMASK_SET: "022"
+      labels:
+        traefik.enable: "true"
+        traefik.http.routers.sonarr.rule: Host(`sonarr.wg`)
+        traefik.http.routers.sonarr.entrypoints: web
+      volumes:
+        - sonarrconfig:/config
+        - nzbgetdata:/data/usnet
+        - mediatv:/data/media/tv
       networks:
         - name: media
 
