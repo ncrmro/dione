@@ -60,6 +60,16 @@
       - nzbget_downloads:/data/usnet
     networks:
       - name: media
+    hostname: sonarr
+    healthcheck:
+      # Check if nginx server is healthy by curl'ing the server.
+      # If this fails or timeouts, the healthcheck fails.
+      # Comment out on first run to get API key
+      test: ["CMD", "curl", "-X", "GET", "--fail",  "http://localhost:8989/api/system/status?apikey=d5880ddd1a114a46b6fa49ac317b59a7"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
 
 - name: Radarr
   docker_container:
@@ -74,7 +84,7 @@
       UMASK_SET: "022"
     labels:
       traefik.enable: "true"
-      traefik.http.routers.radarr.rule: Host(`radar.wg`)
+      traefik.http.routers.radarr.rule: Host(`radarr.wg`)
       traefik.http.routers.radarr.entrypoints: web
     volumes:
       - radarr_config:/config
@@ -82,6 +92,16 @@
       - nzbget_downloads:/data/usnet
     networks:
       - name: media
+    hostname: radarr
+    healthcheck:
+      # Check if nginx server is healthy by curl'ing the server.
+      # If this fails or timeouts, the healthcheck fails.
+      # Comment out on first run to get API key
+      test: ["CMD", "curl", "-X", "GET", "--fail",  "http://localhost:7878/api/system/status?apikey=38dd32cf03324c3cb82cb85acb902b75"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
 
 - name: Create plex_config volume with options
   docker_volume:
