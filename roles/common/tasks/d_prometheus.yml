@@ -5,7 +5,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/prometheus-config
-      o: addr=192.168.1.88,rw,vers=4,async
+      o: addr=192.168.1.76,rw,vers=4,async
 
 - name: Create a volume with options
   docker_volume:
@@ -14,7 +14,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/prometheus-data
-      o: addr=192.168.1.88,rw,vers=4,async
+      o: addr=192.168.1.76,rw,vers=4,async
 
 - name: Create prometheus network
   docker_network:

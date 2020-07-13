@@ -4,7 +4,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/nzbget-config
-      o: addr=192.168.1.88,rw,vers=4,async
+      o: addr=192.168.1.76,rw,vers=4,async
 
 - docker_volume:
     name: nzbget_downloads
@@ -12,7 +12,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/downloads/usenet
-      o: addr=192.168.1.88,rw,vers=4,async
+      o: addr=192.168.1.76,rw,vers=4,async
 
 - name: Nzbget
   docker_container:
