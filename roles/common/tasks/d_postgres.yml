@@ -1,6 +1,6 @@
 - name: Create a volume with options
   docker_volume:
-    name: pgdata
+    name: postgres_data
     driver: local
     driver_options:
       type: nfs
@@ -24,6 +24,9 @@
     ports:
      - "{{ wg_ip }}:5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data:rw
     networks:
       - name: pg
+    hostname: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]

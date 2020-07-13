@@ -1,6 +1,15 @@
 - name: Create a volume with options
   docker_volume:
-    name: promdata
+    name: prom_config
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/prometheus-config
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Create a volume with options
+  docker_volume:
+    name: prom_data
     driver: local
     driver_options:
       type: nfs
@@ -16,13 +25,24 @@
     name: prom
     state: started
     image: prom/prometheus
+    user: root:wheel
     restart_policy: always
+    memory: "256M"
     labels:
       traefik.enable: "true"
       traefik.http.routers.prom.rule: Host(`prom.wg`)
       traefik.http.routers.prom.entrypoints: web
     volumes:
-      - promdata:/prometheus:nocopy
+      - prom_config:/etc/prometheus:nocopy
+      - prom_data:/prometheus
+    etc_hosts:
+      dione: 10.2.3.25
+      ncmro_workstation: 10.2.3.5
     networks:
       - name: pg
       - name: prom
+    hostname: prom
+# no curl!
+#    healthcheck:
+#      test: ["CMD", "curl", "-X", "GET", "--fail",  "http://localhost:9090/-/healthy"]
+#      retries: 10

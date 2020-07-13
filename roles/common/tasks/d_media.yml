@@ -45,6 +45,7 @@
     state: started
     image: linuxserver/sonarr
     restart_policy: always
+    memory: "256M"
     env:
       PUID: "0"
       PGID: "0"
@@ -77,6 +78,7 @@
     state: started
     image: linuxserver/radarr
     restart_policy: always
+    memory: "256M"
     env:
       PUID: "0"
       PGID: "0"
@@ -118,7 +120,7 @@
     state: started
     image: linuxserver/plex
     restart_policy: always
-    recreate: true
+    memory: "756M"
     env:
       PUID: "0"
       PGID: "0"
