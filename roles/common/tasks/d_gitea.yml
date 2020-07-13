@@ -1,0 +1,39 @@
+- name: Create a volume with options
+  docker_volume:
+    name: gitea_data
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/gitea-data
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Start Gitea
+  docker_container:
+    name: gitea
+    state: started
+    image: gitea/gitea
+    restart_policy: always
+    memory: "512M"
+    env:
+      USER_UID: "0"
+      USER_GID: "0"
+      DB_TYPE: postgres
+      DB_HOST: pg:5432
+      DB_NAME: gitea
+      DB_USER: gitea
+      DB_PASSWD: 8vwP97xpBTxRNSxbHczQKmnJ!xn5zMH#
+    ports:
+     - "{{ wg_ip }}:2222:2222"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gitea.rule: Host(`gitea.wg`)
+      traefik.http.routers.gitea.entrypoints: web
+      traefik.http.services.gitea.loadbalancer.server.port: "3000"
+    volumes:
+      - gitea_data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - name: pg
+    hostname: gitea
+

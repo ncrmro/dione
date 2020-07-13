@@ -14,6 +14,7 @@
     image: grafana/grafana:7.0.6-ubuntu
     restart_policy: always
     memory: "32M"
+    recreate: true
     env:
       GF_DATABASE_TYPE: postgres
       GF_DATABASE_HOST: pg:5432

@@ -29,6 +29,9 @@
     restart_policy: always
     memory: "256M"
     cpu_shares: "1024"
+    recreate: true
+    env:
+      GF_INSTALL_PLUGINS: "grafana-piechart-panel"
     labels:
       traefik.enable: "true"
       traefik.http.routers.prom.rule: Host(`prom.wg`)
@@ -47,3 +50,5 @@
 #    healthcheck:
 #      test: ["CMD", "curl", "-X", "GET", "--fail",  "http://localhost:9090/-/healthy"]
 #      retries: 10
+
+# sudo docker exec -it graf grafana-cli plugins install grafana-piechart-panel
