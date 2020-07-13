@@ -13,7 +13,7 @@
     state: started
     image: grafana/grafana:7.0.6-ubuntu
     restart_policy: always
-    memory: "256M"
+    memory: "32M"
     env:
       GF_DATABASE_TYPE: postgres
       GF_DATABASE_HOST: pg:5432

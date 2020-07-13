@@ -46,6 +46,7 @@
     image: linuxserver/sonarr
     restart_policy: always
     memory: "256M"
+    cpu_shares: "512"
     env:
       PUID: "0"
       PGID: "0"
@@ -79,6 +80,7 @@
     image: linuxserver/radarr
     restart_policy: always
     memory: "256M"
+    cpu_shares: 512
     env:
       PUID: "0"
       PGID: "0"
@@ -118,9 +120,9 @@
   docker_container:
     name: plex
     state: started
-    image: linuxserver/plex
-    restart_policy: always
+    image: linuxserver/plex    restart_policy: always
     memory: "756M"
+    cpu_shares: 512
     env:
       PUID: "0"
       PGID: "0"

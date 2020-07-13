@@ -28,6 +28,7 @@
     user: root:wheel
     restart_policy: always
     memory: "256M"
+    cpu_shares: "1024"
     labels:
       traefik.enable: "true"
       traefik.http.routers.prom.rule: Host(`prom.wg`)

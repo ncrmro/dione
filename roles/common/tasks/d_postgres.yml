@@ -17,6 +17,7 @@
     state: started
     image: postgres:12.3
     restart_policy: always
+    memory: "512M"
     env:
       POSTGRES_USER: ncrmro
       POSTGRES_PASSWORD: test_password
