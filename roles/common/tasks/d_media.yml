@@ -45,7 +45,6 @@
     state: started
     image: linuxserver/sonarr
     restart_policy: always
-    recreate: true
     env:
       PUID: "0"
       PGID: "0"
@@ -68,7 +67,6 @@
     state: started
     image: linuxserver/radarr
     restart_policy: always
-    recreate: true
     env:
       PUID: "0"
       PGID: "0"
@@ -79,8 +77,41 @@
       traefik.http.routers.radarr.rule: Host(`radar.wg`)
       traefik.http.routers.radarr.entrypoints: web
     volumes:
-      - radarrrconfig:/config
-      - nzbgetdata:/data/usnet
+      - radarr_config:/config
       - media_movies:/data/media/movies
+      - nzbget_downloads:/data/usnet
+    networks:
+      - name: media
+
+- name: Create plex_config volume with options
+  docker_volume:
+    name: plex_config
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/plex-config
+      o: addr=192.168.1.88,rw,vers=4,async
+
+- name: Plex
+  docker_container:
+    name: plex
+    state: started
+    image: linuxserver/plex
+    restart_policy: always
+    recreate: true
+    env:
+      PUID: "0"
+      PGID: "0"
+      VERSION: docker
+      PLEX_CLAIM: "claim-Fu7gujiwbh-T6xU8iVSU"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.plex.rule: Host(`plex.wg`)
+      traefik.http.routers.plex.entrypoints: web
+      traefik.http.services.plex.loadbalancer.server.port: "32400"
+    volumes:
+      - plex_config:/config:rw
+      - media_tv:/tv:ro
+      - media_movies:/movies:ro
     networks:
       - name: media
