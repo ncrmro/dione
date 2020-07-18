@@ -20,7 +20,7 @@
     state: started
     image: linuxserver/nzbget
     restart_policy: always
-    memory: "32M"
+    memory: "256M"
     cpu_shares: 512
     env:
       PUID: "0"

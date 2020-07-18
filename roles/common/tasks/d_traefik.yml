@@ -5,7 +5,7 @@
     image: traefik:2.2.1
     recreate: true
     restart_policy: always
-    memory: "34M"
+    memory: "64M"
     cpu_shares: 1024
     ports:
      - "{{ wg_ip }}:80:80"
