@@ -21,6 +21,7 @@
       GF_DATABASE_NAME: grafana
       GF_DATABASE_USER: grafana
       GF_DATABASE_PASSWORD: grafana
+      GF_INSTALL_PLUGINS: "grafana-piechart-panel"
     labels:
       traefik.enable: "true"
       traefik.http.routers.graf.rule: Host(`grafana.wg`)
