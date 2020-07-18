@@ -28,7 +28,7 @@
       traefik.enable: "true"
       traefik.http.routers.gitea.rule: Host(`gitea.wg`)
       traefik.http.routers.gitea.entrypoints: web
-      traefik.http.services.gitea.loadbalancer.server.port: "3000"
+      traefik.http.services.gitea.loadbalancer.server.port: "80"
     volumes:
       - gitea_data:/data
       - /etc/timezone:/etc/timezone:ro
@@ -37,3 +37,76 @@
       - name: pg
     hostname: gitea
 
+- name: Create Drone Data volume
+  docker_volume:
+    name: drone_data
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/block_storage/drone-data
+      o: addr=192.168.1.76,rw,vers=4,async
+
+
+- name: Connect to acme database, create django user, and grant access to database and products table
+  delegate_to: 127.0.0.1
+  run_once: true
+  become: false
+  remote_user: ncrmro
+  postgresql_user:
+    db: postgres
+    login_host: dione.wg
+    login_user: ncrmro
+    login_password: test_password
+    name: drone
+    password: asddfasdgvasdv
+
+- name: Create a new database with name "drone"
+  delegate_to: 127.0.0.1
+  run_once: true
+  become: false
+  remote_user: ncrmro
+  postgresql_db:
+    db: postgres
+    login_host: dione.wg
+    login_user: ncrmro
+    login_password: test_password
+    name: drone
+    owner: drone
+
+
+
+#- pip:
+#    name: docker
+#
+
+#
+
+- name: Start Drone CI
+  docker_container:
+    name: drone
+    state: started
+    image: drone/drone:1
+    restart_policy: always
+    memory: "512M"
+    command: >
+    env:
+      DRONE_GITEA_CLIENT_ID: "93c28f05-7402-4570-bb5a-97bf9219e82e"
+      DRONE_GITEA_CLIENT_SECRET: "cvRqhofmaDHx2o0lhp0MSFD3UMCVj_CPruMoA8NiGBo="
+      DRONE_GITEA_SERVER: http://gitea.wg
+      DRONE_GIT_ALWAYS_AUTH: "1"
+      DRONE_SERVER_HOST: drone.wg
+      DRONE_DATABASE_DRIVER: postgres
+      DRONE_DATABASE_DATASOURCE: postgres://drone:asddfasdgvasdv@pg:5432/drone?sslmode=disable
+      DRONE_DATABASE_SECRET: 96cbcdcab547f1c6b65aca3f23b90ee6
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.drone.rule: Host(`drone.wg`)
+      traefik.http.routers.drone.entrypoints: web
+      traefik.http.services.drone.loadbalancer.server.port: "80"
+    links:
+      - "gitea:gitea.wg"
+    volumes:
+      - drone_data:/data
+    networks:
+      - name: pg
+    hostname: gitea
