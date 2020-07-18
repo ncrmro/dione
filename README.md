@@ -45,3 +45,7 @@ curl -kI --insecure -X "POST" https://ocean.wg/api/v1.0/sharing/nfs/
     "nfs_security": []
 }
 
+
+
+git remote set-url gitea ssh://root@gitea.wg:2222/ncrmro/dione.git
+git remote set-url gitea http://gitea.wg/ncrmro/dione.git
