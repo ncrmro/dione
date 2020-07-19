@@ -6,6 +6,6 @@ steps:
 - name: python
   image: python:3.8-slim
   commands:
-  - pip install -r requirements.txt
   - apt update && apt install git
+  - pip install -r requirements.txt
   - ansible-lint
