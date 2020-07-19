@@ -6,4 +6,4 @@ steps:
 - name: python
   image: python:3.8-slim
   commands:
-  - echo hello worl!
+  - pip install -r requirements.txt
