@@ -1,4 +1,5 @@
-- docker_volume:
+- name: Creathe config
+  docker_volume:
     name: nzbget_config
     driver: local
     driver_options:
@@ -6,7 +7,8 @@
       device: :/mnt/ocean/block_storage/nzbget-config
       o: addr=192.168.1.76,rw,vers=4,async
 
-- docker_volume:
+- name: create downloads folder
+  docker_volume:
     name: nzbget_downloads
     driver: local
     driver_options:
@@ -32,6 +34,6 @@
       traefik.http.routers.nzbget.entrypoints: web
     volumes:
       - nzbget_config:/config:nocopy
-      - nzbget_downloads:/downloads:nocopy
+      - nzbget_downloads:/data/usenet:nocopy
     networks:
       - name: media

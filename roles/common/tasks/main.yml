@@ -1,37 +1,37 @@
-- name: Update packages
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-- name: Pip
-  apt:
-    pkg:
-    - python3-pip
-    - docker.io
-- pip:
-    name: docker
+#- name: Update packages
+#  apt:
+#    update_cache: yes
+#    cache_valid_time: 3600
+#- name: Pip
+#  apt:
+#    pkg:
+#    - python3-pip
+#    - docker.io
+#- pip:
+#    name: docker
+#
+#- name: Set up Traefik Proxy
+#  include: "d_traefik.yml"
+#
+#- name: Set up nzbGet
+#  include: "d_nzbget.yml"
+#
+#- name: Set up media
+#  include: "d_media.yml"
 
-- name: Set up Traefik Proxy
-  include: "d_traefik.yml"
-
-- name: Set up nzbGet
-  include: "d_nzbget.yml"
-
-- name: Set up media
-  include: "d_media.yml"
-
-- name: Set up Prometheus Proxy
-  include: "d_prometheus.yml"
-
-- name: Set up Postgres Proxy
-  include: "d_postgres.yml"
-
-- name: Set up Grafna Proxy
-  include: "d_grafana.yml"
-
+#- name: Set up Prometheus Proxy
+#  include: "d_prometheus.yml"
+#
+#- name: Set up Postgres Proxy
+#  include: "d_postgres.yml"
+#
+#- name: Set up Grafna Proxy
+#  include: "d_grafana.yml"
+#
 - name: Set up Gitea Proxy
   include: "d_gitea.yml"
 
 - name: Set up Traefik Proxy
   include: "d_traefik.yml"
 
-
+#

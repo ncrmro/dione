@@ -59,7 +59,7 @@
     volumes:
       - sonarr_config:/config
       - media_tv:/data/media/tv
-      - nzbget_downloads:/data/usnet
+      - nzbget_downloads:/data/usenet
     networks:
       - name: media
     hostname: sonarr
