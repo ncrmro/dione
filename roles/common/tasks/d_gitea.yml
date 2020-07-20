@@ -67,6 +67,7 @@
       - /etc/localtime:/etc/localtime:ro
     networks:
       - name: pg
+      - name: proxy
       - name: git_ci
         aliases:
         - gitea.wg
@@ -110,6 +111,7 @@
       - drone_data:/data
     networks:
       - name: pg
+      - name: proxy
       - name: git_ci
         aliases:
         - drone.wg
@@ -131,5 +133,6 @@
       DRONE_RUNNER_NETWORKS: git_ci
     networks:
       - name: git_ci
+      - name: proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

@@ -36,4 +36,5 @@
       - nzbget_config:/config:nocopy
       - nzbget_downloads:/data/usenet:nocopy
     networks:
+      - name: proxy
       - name: media

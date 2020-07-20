@@ -61,6 +61,7 @@
       - media_tv:/data/media/tv
       - nzbget_downloads:/data/usenet
     networks:
+      - name: proxy
       - name: media
     hostname: sonarr
     healthcheck:
@@ -95,6 +96,7 @@
       - media_movies:/data/media/movies
       - nzbget_downloads:/data/usnet
     networks:
+      - name: proxy
       - name: media
     hostname: radarr
     healthcheck:
@@ -139,4 +141,5 @@
       - media_tv:/tv:ro
       - media_movies:/movies:ro
     networks:
+      - name: proxy
       - name: media
