@@ -1,28 +1,28 @@
-- name: Connect to acme database, create django user, and grant access to database and products table
-  delegate_to: 127.0.0.1
-  run_once: true
-  become: false
-  remote_user: ncrmro
-  postgresql_user:
-    db: postgres
-    login_host: dione.wg
-    login_user: ncrmro
-    login_password: test_password
-    name: drone
-    password: asddfasdgvasdv
-
-- name: Create a new database with name "drone"
-  delegate_to: 127.0.0.1
-  run_once: true
-  become: false
-  remote_user: ncrmro
-  postgresql_db:
-    db: postgres
-    login_host: dione.wg
-    login_user: ncrmro
-    login_password: test_password
-    name: drone
-    owner: drone
+#- name: Connect to acme database, create django user, and grant access to database and products table
+#  delegate_to: 127.0.0.1
+#  run_once: true
+#  become: false
+#  remote_user: ncrmro
+#  postgresql_user:
+#    db: postgres
+#    login_host: dione.wg
+#    login_user: ncrmro
+#    login_password: test_password
+#    name: drone
+#    password: asddfasdgvasdv
+#
+#- name: Create a new database with name "drone"
+#  delegate_to: 127.0.0.1
+#  run_once: true
+#  become: false
+#  remote_user: ncrmro
+#  postgresql_db:
+#    db: postgres
+#    login_host: dione.wg
+#    login_user: ncrmro
+#    login_password: test_password
+#    name: drone
+#    owner: drone
 
 
 - name: Create a volume with options
@@ -32,7 +32,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/gitea-data
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Create a network
   docker_network:
@@ -68,6 +68,7 @@
     networks:
       - name: pg
       - name: proxy
+      - name: docker_registry
       - name: git_ci
         aliases:
         - gitea.wg
@@ -80,7 +81,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/drone-data
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 
 
@@ -112,6 +113,7 @@
     networks:
       - name: pg
       - name: proxy
+      - name: docker_registry
       - name: git_ci
         aliases:
         - drone.wg
@@ -123,7 +125,8 @@
     state: started
     image: drone/drone-runner-docker:1
     restart_policy: always
-    memory: "64M"
+    memory: "512M"
+    privileged: true
     env:
       DRONE_RPC_PROTO: "http"
       DRONE_RPC_HOST: drone
@@ -133,6 +136,7 @@
       DRONE_RUNNER_NETWORKS: git_ci
     networks:
       - name: git_ci
+      - name: docker_registry
       - name: proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
