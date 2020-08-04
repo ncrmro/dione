@@ -1,0 +1,30 @@
+- name: Create a volume with options
+  docker_volume:
+    name: docker_registry_data
+    driver: local
+    driver_options:
+      type: nfs
+      device: :/mnt/ocean/docker_registry
+      o: addr=192.168.1.81,rw,vers=4,async
+
+- name: Create a network
+  docker_network:
+    name: docker_registry
+
+- name: Start Registry
+  docker_container:
+    name: registry
+    state: started
+    image: registry:2
+    restart_policy: always
+    memory: "512M"
+#    labels:
+#      traefik.enable: "true"
+#      traefik.http.routers.registry.rule: "Host(`registry.wg`)  || Host(`registry`)"
+#      traefik.http.routers.registry.entrypoints: web
+    env:
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+    volumes:
+      - docker_registry_data:/var/lib/registry:rw
+    networks:
+      - name: docker_registry

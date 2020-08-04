@@ -9,7 +9,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/sonarr-config
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Create radarr_config volume with options
   docker_volume:
@@ -18,7 +18,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/radarr-config
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Create media_tv volume
   docker_volume:
@@ -27,7 +27,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/media/tv
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Create media_movies volume
   docker_volume:
@@ -36,7 +36,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/media/movies
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 # https://old.reddit.com/r/usenet/wiki/docker
 - name: Sonarr
@@ -59,8 +59,9 @@
     volumes:
       - sonarr_config:/config
       - media_tv:/data/media/tv
-      - nzbget_downloads:/data/usenet
+      - nzbget_downloads:/data/downloads/usenet
     networks:
+      - name: proxy
       - name: media
     hostname: sonarr
     healthcheck:
@@ -93,8 +94,9 @@
     volumes:
       - radarr_config:/config
       - media_movies:/data/media/movies
-      - nzbget_downloads:/data/usnet
+      - nzbget_downloads:/data/downloads/usnet
     networks:
+      - name: proxy
       - name: media
     hostname: radarr
     healthcheck:
@@ -114,7 +116,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/plex-config
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Plex
   docker_container:
@@ -122,7 +124,7 @@
     state: started
     image: linuxserver/plex
     restart_policy: always
-    memory: "756M"
+    memory: "512M"
     cpu_shares: 512
     env:
       PUID: "0"
@@ -139,4 +141,5 @@
       - media_tv:/tv:ro
       - media_movies:/movies:ro
     networks:
+      - name: proxy
       - name: media

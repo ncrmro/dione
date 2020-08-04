@@ -5,7 +5,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/block_storage/nzbget-config
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: create downloads folder
   docker_volume:
@@ -14,7 +14,7 @@
     driver_options:
       type: nfs
       device: :/mnt/ocean/downloads/usenet
-      o: addr=192.168.1.76,rw,vers=4,async
+      o: addr=192.168.1.81,rw,vers=4,async
 
 - name: Nzbget
   docker_container:
@@ -22,7 +22,7 @@
     state: started
     image: linuxserver/nzbget
     restart_policy: always
-    memory: "256M"
+    memory: "64M"
     cpu_shares: 512
     env:
       PUID: "0"
@@ -34,6 +34,9 @@
       traefik.http.routers.nzbget.entrypoints: web
     volumes:
       - nzbget_config:/config:nocopy
-      - nzbget_downloads:/data/usenet:nocopy
+      - nzbget_downloads:/data/downloads/usenet:nocopy
+      - media_tv:/data/media/tv:nocopy
+      - media_movies:/data/media/movies:nocopy
     networks:
+      - name: proxy
       - name: media
