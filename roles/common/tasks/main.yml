@@ -9,30 +9,16 @@
 #    - docker.io
 #- pip:
 #    name: docker
-#
-#- name: Set up Traefik Proxy
-#  include: "d_traefik.yml"
-#
+
+- name: Set up Traefik Proxy
+  include: "d_traefik.yml"
+
 - name: Set up nzbGet
   include: "d_nzbget.yml"
 
 - name: Set up media
   include: "d_media.yml"
-#
-#- name: Set up Prometheus Proxy
-#  include: "d_prometheus.yml"
-#
-#- name: Set up Postgres Proxy
-#  include: "d_postgres.yml"
 
-#- name: Set up Grafna Proxy
-#  include: "d_grafana.yml"
-#
 
 #- name: Set up Registry
 #  include: "d_registry.yml"
-
-- name: Set up Gitea VCS, Drone CI and Drone Runners
-  include: "d_gitea.yml"
-
-#
