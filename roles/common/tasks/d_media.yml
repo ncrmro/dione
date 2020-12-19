@@ -94,7 +94,7 @@
     volumes:
       - radarr_config:/config
       - media_movies:/data/media/movies
-      - nzbget_downloads:/data/downloads/usnet
+      - nzbget_downloads:/data/downloads/usenet
     networks:
       - name: proxy
       - name: media

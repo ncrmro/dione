@@ -35,8 +35,6 @@
     volumes:
       - nzbget_config:/config:nocopy
       - nzbget_downloads:/data/downloads/usenet:nocopy
-      - media_tv:/data/media/tv:nocopy
-      - media_movies:/data/media/movies:nocopy
     networks:
       - name: proxy
       - name: media
