@@ -1,10 +1,5 @@
-- name: Setup hosts.
-  hosts: dione
-  remote_user: root
-  become: true
-  become_method: sudo
-  vars_files:
-    - vars.yml
-  tasks:
-  - include_role:
-      name: common
+- name: Setup workloads
+  hosts: localhost
+  roles:
+    - role: services/lidarr
+      tags: [media,lidar]

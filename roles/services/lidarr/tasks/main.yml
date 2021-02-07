@@ -1,0 +1,13 @@
+- name: Add default repository
+  community.kubernetes.helm_repository:
+    repo_name: k8s-at-home/lidarr
+    repo_url: k8s-at-home https://k8s-at-home.com/charts/
+
+- name: Deploy Helm Chart
+  community.kubernetes.helm:
+    name: lidarr
+    chart_ref:  k8s-at-home/lidarr
+    chart_version: 6.3.1
+    release_namespace: "kube-system"
+    release_values:
+      existingConfigMap: metallb-config
